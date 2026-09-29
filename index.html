@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+  <title>Personal Finance Advisor Bot</title>
+  <meta name="description" content="AI-powered personal finance planning assistant for budgets, spending insights, saving suggestions, and monthly reports.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="navbar" aria-label="Primary navigation">
+      <div class="container nav-inner">
+        <a class="brand" href="#home" aria-label="Personal Finance Advisor Bot home">
+          <span class="brand-mark"><i class="fa-solid fa-chart-line"></i></span>
+          <span>
+            <strong>FinancePilot</strong>
+            <small>Personal Finance Advisor Bot</small>
+          </span>
+        </a>
+
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open navigation">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-menu" id="navMenu">
+          <a href="#home">Home</a>
+          <a href="#planner">Planner</a>
+          <a href="#results">Insights</a>
+          <a href="#history">History</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero" id="home">
+      <div class="hero-grid"></div>
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="status-dot"></span> AI-powered financial planning</div>
+          <h1>Turn your monthly money data into a plan you can actually follow.</h1>
+          <p>
+            Track income and expenses, generate a personalized budget, spot overspending,
+            and get practical saving recommendations in one calm financial workspace.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-scroll="#planner">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My Finances
+            </button>
+            <button class="btn btn-ghost" data-scroll="#results">
+              <i class="fa-solid fa-arrow-down"></i> View Insights
+            </button>
+          </div>
+
+          <div class="trust-row">
+            <span><i class="fa-solid fa-shield-halved"></i> Local + SQLite persistence</span>
+            <span><i class="fa-solid fa-bolt"></i> Fast calculations</span>
+            <span><i class="fa-solid fa-robot"></i> Gemini-ready AI</span>
+          </div>
+        </div>
+
+        <div class="hero-panel glass">
+          <div class="panel-top">
+            <div>
+              <span class="panel-kicker">AI FINANCE ENGINE</span>
+              <h2 id="engineHeadline">Ready to analyse</h2>
+            </div>
+            <span class="live-badge"><span class="status-dot"></span> Online</span>
+          </div>
+
+          <div class="signal-list">
+            <div class="signal">
+              <span class="signal-icon cyan"><i class="fa-solid fa-wallet"></i></span>
+              <div><strong>Budget planning</strong><small>Category targets + savings goal</small></div>
+              <i class="fa-solid fa-check signal-ok"></i>
+            </div>
+            <div class="signal">
+              <span class="signal-icon purple"><i class="fa-solid fa-chart-pie"></i></span>
+              <div><strong>Spending analysis</strong><small>Overspending and category health</small></div>
+              <i class="fa-solid fa-check signal-ok"></i>
+            </div>
+            <div class="signal">
+              <span class="signal-icon green"><i class="fa-solid fa-piggy-bank"></i></span>
+              <div><strong>Saving suggestions</strong><small>Actionable rupee-based recommendations</small></div>
+              <i class="fa-solid fa-check signal-ok"></i>
+            </div>
+            <div class="signal">
+              <span class="signal-icon amber"><i class="fa-solid fa-file-lines"></i></span>
+              <div><strong>Monthly summary</strong><small>Income, expenses, savings and next steps</small></div>
+              <i class="fa-solid fa-check signal-ok"></i>
+            </div>
+          </div>
+
+          <div class="hero-mini-grid">
+            <div><span id="heroIncome">₹0</span><small>Income</small></div>
+            <div><span id="heroExpenses">₹0</span><small>Expenses</small></div>
+            <div><span id="heroSavings">₹0</span><small>Remaining</small></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section" id="planner">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">01 · PLAN</div>
+              <h2>Build your monthly financial picture</h2>
+              <p>Enter income, category spending, and your main financial goal. You can also add daily or weekly expense logs.</p>
+            </div>
+            <div class="chip-row">
+              <span class="chip">Flask</span>
+              <span class="chip">SQLite</span>
+              <span class="chip">Gemini AI</span>
+            </div>
+          </div>
+
+          <form id="financeForm" class="planner-layout">
+            <div class="glass form-card">
+              <div class="card-heading">
+                <div>
+                  <span class="step-number">1</span>
+                  <h3>Income & goal</h3>
+                </div>
+                <span class="muted">Required</span>
+              </div>
+
+              <div class="form-group">
+                <label for="income">Monthly income <span>*</span></label>
+                <div class="input-with-prefix">
+                  <span>₹</span>
+                  <input id="income" name="income" type="number" min="1" step="100" placeholder="50000" required>
+                </div>
+                <small class="field-hint">Use your expected monthly take-home income.</small>
+                <span class="error" id="incomeError"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="goal">Primary financial goal <span>*</span></label>
+                <select id="goal" name="goal" required>
+                  <option value="emergency fund">Emergency fund</option>
+                  <option value="vacation">Vacation</option>
+                  <option value="gadget purchase">Gadget purchase</option>
+                  <option value="investment">Investment</option>
+                </select>
+                <span class="error" id="goalError"></span>
+              </div>
+
+              <div class="goal-preview">
+                <span class="goal-icon"><i class="fa-solid fa-bullseye"></i></span>
+                <div>
+                  <strong id="goalTitle">Emergency fund</strong>
+                  <span id="goalDescription">Build a cash buffer for unexpected expenses.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass form-card expense-card">
+              <div class="card-heading">
+                <div>
+                  <span class="step-number">2</span>
+                  <h3>Monthly expenses</h3>
+                </div>
+                <span class="muted">Use 0 where not applicable</span>
+              </div>
+
+              <div class="expense-grid">
+                <div class="form-group"><label for="rent">Rent</label><div class="input-with-prefix"><span>₹</span><input id="rent" type="number" min="0" step="100" placeholder="12000"></div></div>
+                <div class="form-group"><label for="food">Food</label><div class="input-with-prefix"><span>₹</span><input id="food" type="number" min="0" step="100" placeholder="6000"></div></div>
+                <div class="form-group"><label for="transport">Transport</label><div class="input-with-prefix"><span>₹</span><input id="transport" type="number" min="0" step="100" placeholder="3000"></div></div>
+                <div class="form-group"><label for="dining">Dining</label><div class="input-with-prefix"><span>₹</span><input id="dining" type="number" min="0" step="100" placeholder="2500"></div></div>
+                <div class="form-group"><label for="entertainment">Entertainment</label><div class="input-with-prefix"><span>₹</span><input id="entertainment" type="number" min="0" step="100" placeholder="1500"></div></div>
+                <div class="form-group"><label for="utilities">Utilities</label><div class="input-with-prefix"><span>₹</span><input id="utilities" type="number" min="0" step="100" placeholder="3000"></div></div>
+                <div class="form-group"><label for="savings">Current savings</label><div class="input-with-prefix"><span>₹</span><input id="savings" type="number" min="0" step="100" placeholder="5000"></div></div>
+              </div>
+
+              <div class="expense-log-head">
+                <div>
+                  <strong>Daily / weekly expense log</strong>
+                  <small>Add individual expenses when you want a more detailed picture.</small>
+                </div>
+                <button type="button" class="btn btn-small btn-outline" id="addExpenseBtn"><i class="fa-solid fa-plus"></i> Add expense</button>
+              </div>
+
+              <div class="log-table-wrap">
+                <table class="log-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Category</th>
+                      <th>Amount</th>
+                      <th>Frequency</th>
+                      <th>Note</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="expenseLogBody"></tbody>
+                </table>
+                <div class="empty-log" id="emptyLog">
+                  <i class="fa-regular fa-calendar-plus"></i>
+                  <span>No detailed expense logs yet.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass form-card full-width">
+              <div class="card-heading">
+                <div>
+                  <span class="step-number">3</span>
+                  <h3>Analyse & generate plan</h3>
+                </div>
+                <span class="muted">AI + rule-based fallback</span>
+              </div>
+
+              <div class="submit-row">
+                <div class="privacy-note">
+                  <i class="fa-solid fa-lock"></i>
+                  <div>
+                    <strong>Your data stays under your control</strong>
+                    <span>Records are saved to local browser history and SQLite when Flask is running. Google Sheets sync is optional.</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-large" id="analyseBtn" type="submit">
+                  <span id="analyseBtnText"><i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My Finances</span>
+                  <span id="analyseBtnLoading" class="hidden"><i class="fa-solid fa-circle-notch fa-spin"></i> Analysing...</span>
+                </button>
+              </div>
+              <div class="form-note">Educational tool only — generated guidance is not a substitute for professional financial advice.</div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="section section-soft" id="results">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">02 · INSIGHTS</div>
+              <h2>Your financial dashboard</h2>
+              <p id="resultsSubtitle">Run an analysis to generate your personalized monthly plan.</p>
+            </div>
+            <div class="result-meta">
+              <span class="source-badge" id="resultSource">Waiting for analysis</span>
+              <span class="source-badge" id="cloudSyncBadge">Cloud sync: not configured</span>
+            </div>
+          </div>
+
+          <div class="summary-strip">
+            <div class="metric-card glass">
+              <span class="metric-icon cyan"><i class="fa-solid fa-wallet"></i></span>
+              <div><small>Monthly income</small><strong id="summaryIncome">₹0</strong></div>
+            </div>
+            <div class="metric-card glass">
+              <span class="metric-icon purple"><i class="fa-solid fa-receipt"></i></span>
+              <div><small>Total expenses</small><strong id="summaryExpenses">₹0</strong></div>
+            </div>
+            <div class="metric-card glass">
+              <span class="metric-icon green"><i class="fa-solid fa-piggy-bank"></i></span>
+              <div><small>Projected savings</small><strong id="summarySavings">₹0</strong></div>
+            </div>
+            <div class="metric-card glass">
+              <span class="metric-icon amber"><i class="fa-solid fa-bullseye"></i></span>
+              <div><small>Goal</small><strong id="summaryGoal">—</strong></div>
+            </div>
+          </div>
+
+          <div id="resultsEmpty" class="glass empty-results">
+            <div class="empty-illustration"><i class="fa-solid fa-chart-column"></i></div>
+            <h3>No analysis yet</h3>
+            <p>Fill in your income and spending above to see a budget plan, spending analysis, and saving suggestions.</p>
+            <button class="btn btn-outline" data-scroll="#planner">Start planning</button>
+          </div>
+
+          <div id="resultsContent" class="results-layout hidden">
+            <section class="glass results-card">
+              <div class="results-card-heading">
+                <div>
+                  <span class="card-kicker">PERSONALISED BUDGET</span>
+                  <h3>Recommended monthly allocation</h3>
+                </div>
+                <span class="mini-badge" id="budgetStatus">Plan ready</span>
+              </div>
+              <div id="budgetGrid" class="budget-grid"></div>
+              <div class="budget-footer">
+                <div><span>Recommended savings target</span><strong id="savingsTarget">₹0</strong></div>
+                <div class="progress-track"><span id="savingsProgress"></span></div>
+              </div>
+            </section>
+
+            <section class="glass results-card">
+              <div class="results-card-heading">
+                <div>
+                  <span class="card-kicker">SPENDING ANALYSIS</span>
+                  <h3>Where your money is going</h3>
+                </div>
+              </div>
+              <div id="analysisList" class="analysis-list"></div>
+            </section>
+
+            <section class="glass results-card">
+              <div class="results-card-heading">
+                <div>
+                  <span class="card-kicker">SAVING SUGGESTIONS</span>
+                  <h3>Actions for the next month</h3>
+                </div>
+              </div>
+              <ol id="suggestionsList" class="suggestions-list"></ol>
+            </section>
+
+            <section class="glass results-card summary-card">
+              <div class="results-card-heading">
+                <div>
+                  <span class="card-kicker">MONTHLY REPORT</span>
+                  <h3>AI financial summary</h3>
+                </div>
+              </div>
+              <div class="report-grid">
+                <div class="report-highlight">
+                  <span class="report-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+                  <div><small>Savings rate</small><strong id="savingsRate">0%</strong></div>
+                </div>
+                <div class="report-highlight">
+                  <span class="report-icon"><i class="fa-solid fa-arrow-trend-up"></i></span>
+                  <div><small>Largest expense</small><strong id="largestExpense">—</strong></div>
+                </div>
+              </div>
+              <p id="summaryText" class="report-text">Your summary will appear here after analysis.</p>
+              <div class="goal-next" id="goalNextStep"><i class="fa-solid fa-flag-checkered"></i><span>Goal action will appear here.</span></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="history">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">03 · HISTORY</div>
+              <h2>Recent financial analyses</h2>
+              <p>Keep a local trail of your planning sessions and review how your numbers change over time.</p>
+            </div>
+            <button class="btn btn-outline btn-small" id="clearHistoryBtn"><i class="fa-solid fa-trash"></i> Clear history</button>
+          </div>
+
+          <div class="glass history-card">
+            <div id="historyContainer"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-soft">
+        <div class="container">
+          <div class="feature-band glass">
+            <div>
+              <div class="eyebrow">BUILT FOR THE SKILLWALLET WORKFLOW</div>
+              <h2>From raw expense entries to a structured monthly financial report.</h2>
+              <p>
+                The application combines Flask, SQLAlchemy with SQLite, JavaScript-driven rendering,
+                Gemini AI analysis, and optional Google Sheets tracking. It is designed for fast local testing and public tunnelling with Ngrok.
+              </p>
+            </div>
+            <div class="architecture-pills">
+              <span>Python</span><span>Flask</span><span>SQLAlchemy</span><span>SQLite</span><span>Gemini AI</span><span>JavaScript</span><span>Google Sheets</span><span>Ngrok</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <strong>FinancePilot · Personal Finance Advisor Bot</strong>
+          <span>AI-assisted budgeting and financial planning workspace.</span>
+        </div>
+        <span class="footer-disclaimer">Educational tool only. Not a loan, investment, tax, or professional financial advisory service.</span>
+      </div>
+    </footer>
+  </div>
+
+  <div class="loading-overlay hidden" id="loadingOverlay" aria-live="polite" aria-busy="true">
+    <div class="loading-card glass">
+      <div class="loading-orb"><i class="fa-solid fa-chart-pie"></i></div>
+      <h3 id="loadingTitle">Analysing your finances</h3>
+      <p id="loadingText">Preparing spending insights and a personalized budget...</p>
+      <div class="loading-track"><span></span></div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+
+  <script src="static/script.js"></script>
+</body>
+</html>
