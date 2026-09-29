@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Personal Finance Advisor Bot — AI-powered budget planning, expense tracking, saving progress and monthly reporting MVP.">
+<title>Personal Finance Advisor Bot | Smart Money Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<style>
+:root{
+  --bg:#060913;--bg2:#0d1324;--surface:rgba(16,24,42,.72);--surface2:rgba(20,31,54,.9);
+  --surface3:rgba(255,255,255,.045);--line:rgba(148,163,184,.15);--line2:rgba(124,92,255,.35);
+  --text:#f8fafc;--muted:#aab5c9;--muted2:#76839b;--primary:#7c5cff;--primary2:#3b82f6;
+  --cyan:#22d3ee;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--shadow:0 24px 70px rgba(0,0,0,.35);
+  --radius:24px;--radius2:17px;--container:1220px
+}
+[data-theme="light"]{
+  --bg:#f4f7fb;--bg2:#eaf0fb;--surface:rgba(255,255,255,.82);--surface2:rgba(255,255,255,.94);
+  --surface3:rgba(15,23,42,.04);--line:rgba(15,23,42,.09);--line2:rgba(99,102,241,.22);
+  --text:#111827;--muted:#5d6a80;--muted2:#7a869c;--shadow:0 22px 55px rgba(51,65,85,.14)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:
+radial-gradient(circle at 10% 0%,rgba(124,92,255,.18),transparent 32%),
+radial-gradient(circle at 90% 12%,rgba(34,211,238,.11),transparent 28%),
+linear-gradient(160deg,var(--bg),var(--bg2));min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:
+linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 75%)}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.container{width:min(var(--container),calc(100% - 36px));margin:auto}
+.glass{background:linear-gradient(145deg,var(--surface2),var(--surface));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.navbar{position:sticky;top:0;z-index:1000;background:rgba(6,9,19,.76);border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}
+[data-theme="light"] .navbar{background:rgba(244,247,251,.84)}
+.nav-inner{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;min-width:max-content}
+.brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,var(--primary),var(--primary2));box-shadow:0 12px 30px rgba(124,92,255,.25);color:#fff}
+.brand-copy strong{display:block;font:800 17px Manrope,sans-serif;letter-spacing:-.02em}
+.brand-copy span{display:block;color:var(--muted2);font:10px "Space Mono",monospace;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.nav-menu{display:flex;align-items:center;gap:4px;list-style:none;padding:0;margin:0}
+.nav-link{display:inline-flex;align-items:center;gap:8px;padding:10px 11px;color:var(--muted);border-radius:11px;font-size:12px;font-weight:700;transition:.2s}
+.nav-link:hover,.nav-link.active{color:var(--text);background:var(--surface3)}
+.nav-actions{display:flex;gap:8px}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface3);color:var(--muted);display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{color:var(--text);border-color:var(--line2);transform:translateY(-1px)}
+.mobile-toggle{display:none}
+.hero{padding:76px 0 38px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.22fr .78fr;gap:26px;align-items:stretch}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(124,92,255,.3);background:rgba(124,92,255,.1);color:#c8bcff;border-radius:999px;font:11px "Space Mono",monospace;letter-spacing:.05em;text-transform:uppercase}
+[data-theme="light"] .eyebrow{color:#6048e5}
+.hero h1{margin:18px 0 10px;font:800 clamp(40px,6vw,70px)/.98 Manrope,sans-serif;letter-spacing:-.055em;max-width:820px}
+.gradient-text{background:linear-gradient(110deg,#fff 8%,#b8aaff 45%,#5ddcff 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+[data-theme="light"] .gradient-text{background:linear-gradient(110deg,#111827 8%,#5a43dd 45%,#0a8daa 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-subtitle{color:#b7c1d3;font-size:18px;font-weight:700;margin:0 0 14px}
+[data-theme="light"] .hero-subtitle{color:#4c5a70}
+.hero-description{max-width:760px;color:var(--muted);font-size:14px;line-height:1.8;margin:0}
+.hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:13px;padding:11px 16px;font-weight:800;font-size:12px;min-height:44px;transition:.2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 14px 30px rgba(82,70,229,.24)}
+.btn-secondary{color:var(--text);background:var(--surface3);border:1px solid var(--line)}
+.btn-danger{color:#fecaca;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+.btn-small{min-height:36px;padding:8px 11px;font-size:11px}
+.engine-card{padding:18px;border-radius:var(--radius);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+.engine-card:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;top:-80px;right:-40px;background:radial-gradient(circle,rgba(34,211,238,.2),transparent 68%)}
+.engine-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.engine-title{display:flex;align-items:center;gap:11px}
+.engine-logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.22);color:var(--cyan)}
+.engine-title strong{display:block;font:700 15px Manrope,sans-serif}.engine-title span{display:block;color:var(--muted2);font-size:11px;margin-top:3px}
+.status{display:inline-flex;gap:7px;align-items:center;padding:7px 9px;border-radius:999px;background:rgba(34,197,94,.09);color:#76f39c;border:1px solid rgba(34,197,94,.16);font-size:10px;font-weight:800;text-transform:uppercase}
+.engine-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.engine-service{border:1px solid var(--line);background:rgba(255,255,255,.024);padding:12px;border-radius:14px;color:var(--muted);font-size:11px;display:flex;align-items:center;gap:9px}
+.engine-service i{color:var(--green)}
+.ticker{margin-top:18px;padding:11px 13px;border-radius:13px;background:rgba(0,0,0,.14);border:1px solid var(--line);font:10px "Space Mono",monospace;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.section{padding:42px 0;scroll-margin-top:90px}
+.section-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;margin-bottom:18px}
+.section-head .kicker{display:block;color:var(--primary);font:10px "Space Mono",monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.section-head h2{margin:0;font:800 29px/1.1 Manrope,sans-serif;letter-spacing:-.035em}
+.section-head p{margin:7px 0 0;color:var(--muted);font-size:12px;max-width:760px;line-height:1.7}
+.section-tools{display:flex;gap:8px;flex-wrap:wrap}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.metric-card{padding:15px;border:1px solid var(--line);border-radius:17px;background:var(--surface);min-height:118px}
+.metric-card .ico{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:rgba(124,92,255,.1);color:#b7abff}
+.metric-card strong{display:block;margin-top:11px;font:800 20px Manrope,sans-serif}
+.metric-card span{display:block;margin-top:3px;color:var(--muted2);font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+.layout-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.layout-3{display:grid;grid-template-columns:1.15fr .85fr .85fr;gap:15px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:18px;box-shadow:0 14px 36px rgba(0,0,0,.11)}
+.card h3{margin:0 0 13px;font:800 16px Manrope,sans-serif;display:flex;align-items:center;gap:8px}
+.card h3 small{margin-left:auto;color:var(--muted2);font-size:9px;font-weight:700}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.field{margin-bottom:10px}.field.full{grid-column:1/-1}
+.field label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px;font-size:11px;font-weight:800}
+.field small{display:block;color:var(--muted2);font-size:9px;margin-top:5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);color:var(--text);background:rgba(0,0,0,.17);border-radius:12px;outline:none;padding:11px 12px;transition:.2s}
+[data-theme="light"] .field input,[data-theme="light"] .field select,[data-theme="light"] .field textarea{background:rgba(255,255,255,.84)}
+.field textarea{min-height:95px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(124,92,255,.6);box-shadow:0 0 0 4px rgba(124,92,255,.1)}
+.required{color:#a5b4fc}.error{display:none;color:#fca5a5;font-size:9px;margin-top:5px}.has-error input,.has-error select,.has-error textarea{border-color:rgba(239,68,68,.58)}.has-error .error{display:block}
+.form-actions{display:flex;gap:8px;margin-top:13px}.form-actions .btn{flex:1}
+.quick-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.chip{border:1px solid var(--line);background:var(--surface3);color:var(--muted);border-radius:999px;padding:7px 10px;font-size:9px}.chip:hover{color:var(--text);border-color:var(--line2)}
+.expense-list{display:grid;gap:8px;max-height:350px;overflow:auto;padding-right:2px}.expense-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:13px;background:var(--surface3)}
+.expense-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(34,211,238,.09);color:var(--cyan)}
+.expense-main strong{display:block;font-size:11px}.expense-main span{display:block;color:var(--muted);font-size:9px;margin-top:3px}.expense-amount{font:800 12px Manrope,sans-serif;text-align:right}.empty{text-align:center;padding:28px 10px;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.empty i{font-size:24px;opacity:.55;margin-bottom:8px}.empty p{margin:0;font-size:10px}
+.budget-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.budget-card{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}.budget-row{display:flex;justify-content:space-between;gap:8px;font-size:10px}.budget-row strong{font-size:11px}.budget-bar{height:8px;background:rgba(148,163,184,.12);border-radius:999px;overflow:hidden;margin-top:9px}.budget-fill{width:0;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--cyan));transition:.5s}.budget-note{margin-top:6px;color:var(--muted2);font-size:9px;line-height:1.4}
+.status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 8px;font-size:9px;font-weight:800}.pill-good{background:rgba(34,197,94,.1);color:#86efac}.pill-warn{background:rgba(245,158,11,.1);color:#fcd34d}.pill-bad{background:rgba(239,68,68,.1);color:#fca5a5}
+.chart-box{height:260px;position:relative}.chart-box.tall{height:310px}
+.saving-progress{display:grid;gap:12px}.save-ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;position:relative;margin:5px auto 0;background:conic-gradient(var(--green) 0deg,var(--cyan) 180deg,rgba(255,255,255,.08) 180deg 360deg)}.save-ring:before{content:"";width:128px;height:128px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);position:absolute}.save-ring-content{position:relative;z-index:1;text-align:center}.save-ring-content strong{display:block;font:800 31px Manrope,sans-serif}.save-ring-content span{display:block;color:var(--muted2);font-size:9px;margin-top:2px}.progress-line{height:10px;background:rgba(148,163,184,.12);border-radius:999px;overflow:hidden}.progress-fill{width:0;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));transition:.5s}.save-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini{padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface3)}.mini span{display:block;color:var(--muted2);font-size:9px}.mini strong{display:block;margin-top:5px;font:800 14px Manrope,sans-serif}
+.insights{display:grid;gap:9px}.insight{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface3)}.insight i{margin-top:2px;color:var(--primary)}.insight strong{display:block;font-size:11px}.insight span{display:block;color:var(--muted);font-size:9px;line-height:1.55;margin-top:3px}
+.report-box{display:grid;gap:10px}.report-header{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--line)}.report-header h3{margin:0;font:800 18px Manrope,sans-serif}.report-header p{margin:4px 0 0;color:var(--muted);font-size:10px}.report-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.report-stat{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface3)}.report-stat span{font-size:9px;color:var(--muted2)}.report-stat strong{display:block;margin-top:5px;font-size:13px}.report-table-wrap{overflow:auto}.report-table{width:100%;border-collapse:collapse;font-size:10px}.report-table th,.report-table td{text-align:left;padding:9px;border-bottom:1px solid var(--line)}.report-table th{color:var(--muted2);font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+.ai-layout{display:grid;grid-template-columns:.76fr 1.24fr;gap:15px}.ai-response{min-height:260px;display:flex;flex-direction:column}.ai-text{white-space:pre-wrap;color:var(--muted);line-height:1.75;font-size:11px;overflow:auto}.ai-source{color:#8d9bff;font:9px "Space Mono",monospace;margin-bottom:8px}.typing{display:inline-flex;gap:4px;align-items:center}.typing i{animation:blink 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+.scenario-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.scenario{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}.scenario .num{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;background:rgba(124,92,255,.11);color:#b7abff;font-weight:800;font-size:11px}.scenario h4{margin:10px 0 5px;font:800 13px Manrope,sans-serif}.scenario p{margin:0;color:var(--muted);font-size:10px;line-height:1.65}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.info-card{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}.info-card h4{margin:0 0 6px;font:800 12px Manrope,sans-serif}.info-card p,.info-card li{color:var(--muted);font-size:9px;line-height:1.65}.info-card ul{margin:0;padding-left:16px}
+.workflow{display:grid;gap:8px}.step{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface3)}.step-no{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(124,92,255,.11);color:#b7abff;font-size:10px;font-weight:800}.step strong{display:block;font-size:10px}.step span{display:block;color:var(--muted);font-size:9px;line-height:1.5;margin-top:3px}.task-meta{color:var(--muted2);font-size:8px;text-transform:uppercase;letter-spacing:.06em}
+.tech-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.tech-card{padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.tech-card h4{margin:0 0 5px;font:800 11px Manrope,sans-serif}.tech-card p{margin:0;color:var(--muted);font-size:9px;line-height:1.55}
+.api-row{display:grid;grid-template-columns:1fr auto;gap:8px}.key-note{padding:11px;border:1px solid rgba(245,158,11,.2);background:rgba(245,158,11,.05);border-radius:12px;color:var(--muted);font-size:9px;line-height:1.6;margin-top:10px}.key-note strong{color:#fcd34d}
+.history-list{display:grid;gap:8px}.history-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface3)}.history-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(124,92,255,.1);color:#b7abff}.history-main strong{display:block;font-size:11px}.history-main span{display:block;color:var(--muted);font-size:9px;margin-top:3px}.history-actions{display:flex;gap:6px}
+footer{padding:28px 0 42px;border-top:1px solid var(--line);color:var(--muted2);font-size:9px}.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.toast{position:fixed;right:18px;bottom:18px;z-index:3000;min-width:260px;max-width:400px;padding:13px 15px;border-radius:14px;border:1px solid var(--line);background:rgba(12,18,32,.95);color:#fff;box-shadow:0 16px 40px rgba(0,0,0,.3);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;font-size:10px}.toast.show{transform:translateY(0);opacity:1}.toast.success{border-color:rgba(34,197,94,.24)}.toast.error{border-color:rgba(239,68,68,.24)}.toast.info{border-color:rgba(34,211,238,.24)}
+.loading{position:fixed;inset:0;z-index:2500;background:rgba(4,7,14,.72);backdrop-filter:blur(9px);display:none;align-items:center;justify-content:center}.loading-card{width:min(390px,calc(100% - 30px));padding:24px;border-radius:20px;text-align:center}.spinner{width:52px;height:52px;border-radius:50%;border:3px solid rgba(255,255,255,.08);border-top-color:#9d8dff;animation:spin 1s linear infinite;margin:0 auto 14px}@keyframes spin{to{transform:rotate(360deg)}}.loading h3{margin:0;font:800 16px Manrope,sans-serif}.loading p{margin:7px 0 0;color:var(--muted);font-size:10px}
+.hidden{display:none!important}
+@media(max-width:1100px){.nav-menu{display:none;position:absolute;top:72px;left:18px;right:18px;padding:10px;flex-direction:column;align-items:stretch;border:1px solid var(--line);border-radius:15px;background:var(--surface2);box-shadow:var(--shadow)}.nav-menu.open{display:flex}.nav-link{width:100%}.mobile-toggle{display:grid}.grid-5{grid-template-columns:repeat(3,1fr)}.layout-3{grid-template-columns:1fr 1fr}.tech-grid{grid-template-columns:repeat(3,1fr)}.info-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){.hero-grid,.layout-2,.layout-3,.ai-layout{grid-template-columns:1fr}.hero{padding-top:54px}.report-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.container{width:min(var(--container),calc(100% - 24px))}.hero h1{font-size:42px}.hero-subtitle{font-size:15px}.form-grid,.scenario-grid{grid-template-columns:1fr}.grid-5{grid-template-columns:1fr 1fr}.budget-grid{grid-template-columns:1fr}.tech-grid{grid-template-columns:1fr 1fr}.info-grid{grid-template-columns:1fr}.section{padding:33px 0}.card{padding:14px}.section-head{align-items:flex-start;flex-direction:column}.report-summary{grid-template-columns:1fr 1fr}.history-item{grid-template-columns:auto 1fr}.history-actions{grid-column:2}.nav-actions .icon-btn:first-child{display:none}}
+</style>
+</head>
+
+<body data-theme="dark">
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="#home" class="brand" aria-label="Personal Finance Advisor Bot home">
+      <div class="brand-mark"><i class="fa-solid fa-chart-line"></i></div>
+      <div class="brand-copy"><strong>Finance Advisor Bot</strong><span>AI Personal Finance Workspace</span></div>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+      <li><a class="nav-link active" href="#home"><i class="fa-solid fa-house"></i> Home</a></li>
+      <li><a class="nav-link" href="#planner"><i class="fa-solid fa-wallet"></i> Planner</a></li>
+      <li><a class="nav-link" href="#insights"><i class="fa-solid fa-chart-pie"></i> Insights</a></li>
+      <li><a class="nav-link" href="#savings"><i class="fa-solid fa-piggy-bank"></i> Savings</a></li>
+      <li><a class="nav-link" href="#reports"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
+      <li><a class="nav-link" href="#ai"><i class="fa-solid fa-sparkles"></i> AI Advisor</a></li>
+      <li><a class="nav-link" href="#project"><i class="fa-solid fa-diagram-project"></i> Project</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><i class="fa-solid fa-sun"></i></button>
+      <button class="icon-btn mobile-toggle" id="navToggle" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</nav>
+
+<header id="home" class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow"><i class="fa-solid fa-brain"></i> AI • PERSONAL FINANCE • MVP</span>
+      <h1><span class="gradient-text">Take control</span><br>of your money.</h1>
+      <p class="hero-subtitle">Personal Finance Advisor Bot</p>
+      <p class="hero-description">
+        A modern finance workspace for monthly income, daily and weekly expense tracking, personalized budget planning,
+        savings progress, spending analysis and structured monthly reporting. Built as a polished single-file MVP with
+        local intelligence and optional Gemini AI integration.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#planner"><i class="fa-solid fa-bolt"></i> Start Financial Analysis</a>
+        <button class="btn btn-secondary" id="demoBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Load Demo Data</button>
+      </div>
+    </div>
+
+    <div class="engine-card glass">
+      <div>
+        <div class="engine-top">
+          <div class="engine-title">
+            <div class="engine-logo"><i class="fa-solid fa-microchip"></i></div>
+            <div><strong>AI Financial Engine</strong><span>Rules + local reasoning + optional Gemini</span></div>
+          </div>
+          <span class="status"><i class="fa-solid fa-circle"></i> Active</span>
+        </div>
+        <div class="engine-grid">
+          <div class="engine-service"><i class="fa-solid fa-circle-check"></i> Budget Generator</div>
+          <div class="engine-service"><i class="fa-solid fa-circle-check"></i> Spending Analyzer</div>
+          <div class="engine-service"><i class="fa-solid fa-circle-check"></i> Saving Suggestions</div>
+          <div class="engine-service"><i class="fa-solid fa-circle-check"></i> Monthly Reports</div>
+        </div>
+      </div>
+      <div class="ticker">SYSTEM READY • localStorage enabled • Sheets-ready CSV export • Gemini integration ready</div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="dashboard">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="kicker">Workspace overview</span>
+        <h2>Your monthly money snapshot</h2>
+        <p>Track the month from one screen and keep the important numbers visible while you plan.</p>
+      </div>
+      <div class="section-tools">
+        <button class="btn btn-secondary btn-small" id="resetMonthBtn"><i class="fa-solid fa-rotate"></i> Reset Month</button>
+        <button class="btn btn-primary btn-small" id="exportDataBtn"><i class="fa-solid fa-download"></i> Export CSV</button>
+      </div>
+    </div>
+    <div class="grid-5">
+      <div class="metric-card"><div class="ico"><i class="fa-solid fa-indian-rupee-sign"></i></div><strong id="dashIncome">₹0</strong><span>Monthly income</span></div>
+      <div class="metric-card"><div class="ico"><i class="fa-solid fa-receipt"></i></div><strong id="dashExpenses">₹0</strong><span>Total expenses</span></div>
+      <div class="metric-card"><div class="ico"><i class="fa-solid fa-piggy-bank"></i></div><strong id="dashSavings">₹0</strong><span>Monthly savings</span></div>
+      <div class="metric-card"><div class="ico"><i class="fa-solid fa-percent"></i></div><strong id="dashSavingsRate">0%</strong><span>Savings rate</span></div>
+      <div class="metric-card"><div class="ico"><i class="fa-solid fa-gauge-high"></i></div><strong id="dashBudgetStatus">Ready</strong><span>Budget status</span></div>
+    </div>
+  </div>
+</section>
+
+<main>
+<section class="section" id="planner">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Core functionality</span><h2>Build your personal monthly plan</h2><p>Enter income, log expenses across categories, choose a financial goal, and generate a personalized budget with actionable suggestions.</p></div>
+    </div>
+
+    <div class="layout-2">
+      <div class="card">
+        <h3><i class="fa-solid fa-sliders"></i> Monthly financial profile <small>Required inputs</small></h3>
+        <form id="profileForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="month">Planning month <span class="required">*</span></label>
+              <input id="month" type="month">
+              <small>Used for monthly reports and savings tracking.</small>
+              <div class="error" id="monthError"></div>
+            </div>
+            <div class="field">
+              <label for="income">Monthly income <span class="required">*</span></label>
+              <input id="income" type="number" min="0" step="100" placeholder="50000">
+              <small>Salary, allowance or combined monthly earnings.</small>
+              <div class="error" id="incomeError"></div>
+            </div>
+            <div class="field full">
+              <label for="goal">Primary financial goal <span class="required">*</span></label>
+              <select id="goal">
+                <option value="emergency_fund">Build emergency fund</option>
+                <option value="vacation">Save for a vacation</option>
+                <option value="gadget">Save for a gadget purchase</option>
+                <option value="investment">Build an investment corpus</option>
+                <option value="general_savings">Increase monthly savings</option>
+              </select>
+              <small>The goal personalizes the saving recommendations.</small>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" type="button" id="profileDemoBtn"><i class="fa-solid fa-flask"></i> Fill Demo</button>
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-chart-line"></i> Analyze My Finances</button>
+          </div>
+        </form>
+
+        <div class="key-note">
+          <strong>Architecture note:</strong> this standalone MVP uses browser storage for the demo. The project requirement
+          remains integration-ready for Flask, SQLAlchemy/SQLite, Gemini API, and Google Sheets tracking.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-solid fa-bolt"></i> Add a daily / weekly expense <small>Live tracker</small></h3>
+        <form id="expenseForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="expenseCategory">Category <span class="required">*</span></label>
+              <select id="expenseCategory">
+                <option value="rent">Rent / Housing</option>
+                <option value="food">Food / Groceries</option>
+                <option value="transport">Transport</option>
+                <option value="dining">Dining Out</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="utilities">Utilities</option>
+                <option value="education">Education</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="shopping">Shopping</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="expenseAmount">Amount <span class="required">*</span></label>
+              <input id="expenseAmount" type="number" min="1" step="1" placeholder="1200">
+              <div class="error" id="expenseAmountError"></div>
+            </div>
+            <div class="field">
+              <label for="expenseDate">Date</label>
+              <input id="expenseDate" type="date">
+            </div>
+            <div class="field">
+              <label for="expenseFrequency">Frequency</label>
+              <select id="expenseFrequency">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="one_time">One-time</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="expenseNote">Note</label>
+              <input id="expenseNote" maxlength="100" placeholder="e.g. groceries, metro, movie, bill">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" type="button" id="clearExpensesBtn"><i class="fa-solid fa-broom"></i> Clear Expenses</button>
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-plus"></i> Add Expense</button>
+          </div>
+          <div class="quick-chips">
+            <button class="chip" type="button" data-expense="food:850">Food ₹850</button>
+            <button class="chip" type="button" data-expense="transport:320">Transport ₹320</button>
+            <button class="chip" type="button" data-expense="dining:650">Dining ₹650</button>
+            <button class="chip" type="button" data-expense="entertainment:400">Entertainment ₹400</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="layout-2" style="margin-top:15px">
+      <div class="card">
+        <h3><i class="fa-solid fa-list-check"></i> Expense ledger <small id="expenseCount">0 entries</small></h3>
+        <div id="expenseList" class="expense-list"></div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-solid fa-bullseye"></i> Budget engine <small>Threshold-based MVP</small></h3>
+        <div id="budgetEmpty" class="empty"><i class="fa-solid fa-chart-column"></i><p>Run “Analyze My Finances” to generate your category-wise budget.</p></div>
+        <div id="budgetArea" class="hidden">
+          <div class="budget-grid" id="budgetGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="insights">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Analytics</span><h2>Spending insights that explain the numbers</h2><p>Overspending is highlighted by category, with percentage-based breakdowns and practical actions.</p></div>
+      <div class="section-tools"><span class="status-pill pill-good"><i class="fa-solid fa-circle"></i> Local analysis active</span></div>
+    </div>
+    <div class="layout-3">
+      <div class="card"><h3><i class="fa-solid fa-chart-pie"></i> Expense distribution</h3><div class="chart-box"><canvas id="expenseChart"></canvas></div></div>
+      <div class="card"><h3><i class="fa-solid fa-chart-column"></i> Income vs expenses</h3><div class="chart-box"><canvas id="incomeExpenseChart"></canvas></div></div>
+      <div class="card"><h3><i class="fa-solid fa-lightbulb"></i> AI spending analysis</h3><div id="insightsList" class="insights"><div class="empty"><i class="fa-solid fa-wand-magic-sparkles"></i><p>Analyze your finances to generate insights.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="savings">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Saving progress</span><h2>Turn recommendations into a target</h2><p>Track current savings against a goal and monitor the monthly contribution needed to stay on plan.</p></div>
+    </div>
+    <div class="layout-2">
+      <div class="card">
+        <h3><i class="fa-solid fa-piggy-bank"></i> Savings goal</h3>
+        <form id="savingsForm">
+          <div class="form-grid">
+            <div class="field"><label for="savingTarget">Goal amount</label><input id="savingTarget" type="number" min="0" step="100" placeholder="100000"></div>
+            <div class="field"><label for="savedSoFar">Already saved</label><input id="savedSoFar" type="number" min="0" step="100" placeholder="25000"></div>
+            <div class="field"><label for="targetMonths">Target in months</label><input id="targetMonths" type="number" min="1" max="120" step="1" placeholder="6"></div>
+            <div class="field"><label for="monthlySaving">This month contribution</label><input id="monthlySaving" type="number" min="0" step="100" placeholder="10000"></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-secondary" type="button" id="savingDemoBtn"><i class="fa-solid fa-flask"></i> Demo Goal</button><button class="btn btn-primary" type="submit"><i class="fa-solid fa-check"></i> Update Progress</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <h3><i class="fa-solid fa-bullseye"></i> Progress dashboard</h3>
+        <div class="saving-progress">
+          <div class="save-ring" id="saveRing"><div class="save-ring-content"><strong id="savePercent">0%</strong><span>goal complete</span></div></div>
+          <div class="progress-line"><div class="progress-fill" id="saveFill"></div></div>
+          <div class="save-stats">
+            <div class="mini"><span>Goal</span><strong id="saveGoal">₹0</strong></div>
+            <div class="mini"><span>Saved</span><strong id="saveCurrent">₹0</strong></div>
+            <div class="mini"><span>Remaining</span><strong id="saveRemaining">₹0</strong></div>
+            <div class="mini"><span>Monthly needed</span><strong id="saveNeeded">₹0</strong></div>
+          </div>
+          <div id="saveMessage" class="key-note">Set a target to start tracking your savings journey.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reports">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Monthly reporting</span><h2>Structured financial report</h2><p>Summarize income, expenses, savings achieved, overspending categories and next-month goals in one printable view.</p></div>
+      <div class="section-tools"><button class="btn btn-secondary btn-small" id="printReportBtn"><i class="fa-solid fa-print"></i> Print</button><button class="btn btn-primary btn-small" id="exportReportBtn"><i class="fa-solid fa-file-csv"></i> Export Report</button></div>
+    </div>
+    <div class="card report-box" id="reportContent">
+      <div class="empty"><i class="fa-solid fa-file-lines"></i><p>Your monthly report will appear after analysis.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ai">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">AI advisor</span><h2>Ask for personalized financial guidance</h2><p>The MVP uses local rule-based guidance by default. Add a Gemini API key at runtime for optional model-generated responses without shipping a secret in this HTML.</p></div>
+    </div>
+    <div class="ai-layout">
+      <div class="card">
+        <h3><i class="fa-solid fa-key"></i> Gemini connection <small>Optional</small></h3>
+        <div class="field"><label for="geminiKey">Gemini API key</label><input id="geminiKey" type="password" autocomplete="off" placeholder="Paste runtime key (not shipped with the app)"><small>Stored only in this browser session if you choose to use it.</small></div>
+        <div class="api-row"><button class="btn btn-secondary" id="clearGeminiKeyBtn" type="button"><i class="fa-solid fa-trash"></i> Clear key</button><button class="btn btn-primary" id="testGeminiBtn" type="button"><i class="fa-solid fa-plug"></i> Test Gemini</button></div>
+        <div class="quick-chips">
+          <button class="chip" type="button" data-prompt="How can I reduce my food and dining expenses this month?">Reduce food spend</button>
+          <button class="chip" type="button" data-prompt="How much should I keep as an emergency fund?">Emergency fund</button>
+          <button class="chip" type="button" data-prompt="How can I increase my monthly savings from my current income?">Increase savings</button>
+          <button class="chip" type="button" data-prompt="Which expense category should I cut first and why?">Cut first</button>
+        </div>
+      </div>
+      <div class="card ai-response">
+        <div>
+          <div class="ai-source" id="aiSource">Local fallback ready</div>
+          <div class="ai-text" id="aiText">Ask a question below to get personalized guidance.</div>
+        </div>
+        <form id="aiForm" style="margin-top:15px">
+          <div class="field"><label for="aiQuestion">Your question</label><textarea id="aiQuestion" placeholder="Example: I earn ₹50,000 and spend ₹30,000. How should I plan the rest?"></textarea><div class="error" id="aiQuestionError"></div></div>
+          <div class="form-actions"><button class="btn btn-secondary" type="button" id="clearAiBtn"><i class="fa-solid fa-eraser"></i> Clear</button><button class="btn btn-primary" type="submit"><i class="fa-solid fa-sparkles"></i> Ask Advisor</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="history">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Records</span><h2>Analysis history</h2><p>Local browser history for this MVP. Delete individual records or clear the complete history.</p></div>
+      <div class="section-tools"><button class="btn btn-danger btn-small" id="clearHistoryBtn"><i class="fa-solid fa-trash"></i> Clear history</button></div>
+    </div>
+    <div class="card"><div id="historyList"></div></div>
+  </div>
+</section>
+
+<section class="section" id="project">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="kicker">Project specification</span><h2>Requirements covered inside the MVP</h2><p>The interface below mirrors the supplied project brief: scenarios, skills, stats, architecture, system requirements, prerequisites, workflow, UI requirements, deployment flow and conclusion.</p></div>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario"><div class="num">01</div><h4>Salaried professional</h4><p>Logs monthly income and category expenses such as rent, food, transport and entertainment; the system finds overspending, creates a personalized budget and produces a month-end summary with income, expenses, savings and next-month goals.</p></div>
+      <div class="scenario"><div class="num">02</div><h4>College student</h4><p>Manages a limited monthly allowance, sets realistic category limits, tracks spending habits and receives suggestions to reduce discretionary expenditure and improve savings discipline.</p></div>
+      <div class="scenario"><div class="num">03</div><h4>Freelancer</h4><p>Tracks multiple client earnings and project expenses, adapts budget recommendations to fluctuating income, identifies lower-saving months and suggests emergency-fund strategies.</p></div>
+      <div class="scenario"><div class="num">04</div><h4>Household manager</h4><p>Monitors shared family income and expenses such as groceries, utilities, education and healthcare; the bot identifies overruns and supports resource allocation and family savings goals.</p></div>
+    </div>
+
+    <div class="info-grid" style="margin-top:15px">
+      <div class="info-card"><h4>Skills Required</h4><ul><li>Python</li><li>GeminiAI</li><li>Flask (Web Framework)</li><li>SQLite</li><li>JavaScript</li></ul></div>
+      <div class="info-card"><h4>Mentor</h4><p>No mentor assigned yet.</p></div>
+      <div class="info-card"><h4>Project Stats</h4><p><strong>8</strong> Epics<br><strong>15</strong> Stories & Subtasks<br><strong>0</strong> Subtasks</p></div>
+      <div class="info-card"><h4>Model Configuration</h4><p>Project brief specifies <strong>gemini-2.0-flash</strong>, temperature <strong>0.7</strong> and max output tokens <strong>2048</strong>.</p></div>
+    </div>
+
+    <div class="layout-2" style="margin-top:15px">
+      <div class="card">
+        <h3><i class="fa-solid fa-diagram-project"></i> Technical architecture</h3>
+        <div class="workflow">
+          <div class="step"><div class="step-no">01</div><div><strong>Frontend</strong><span>HTML + embedded CSS + JavaScript capture income, expenses and goals and render budget, analysis, suggestions and reports.</span></div><div class="task-meta">UI</div></div>
+          <div class="step"><div class="step-no">02</div><div><strong>Flask backend</strong><span>Home route and POST /analyse endpoint validate input, build the structured finance prompt and return JSON results.</span></div><div class="task-meta">API</div></div>
+          <div class="step"><div class="step-no">03</div><div><strong>AI integration</strong><span>build_prompt() combines financial inputs, CATEGORY_TIPS and GOAL_DESCRIPTIONS; extract_json() handles direct JSON, code fences and raw JSON fallback parsing.</span></div><div class="task-meta">AI</div></div>
+          <div class="step"><div class="step-no">04</div><div><strong>Storage</strong><span>Project brief names SQLAlchemy/SQLite and Google Sheets for structured financial tracking. This browser MVP uses localStorage and CSV export as the self-contained substitute.</span></div><div class="task-meta">DATA</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fa-solid fa-list-check"></i> Functional workflow</h3>
+        <div class="workflow">
+          <div class="step"><div class="step-no">1</div><div><strong>Model selection & architecture</strong><span>Generate API key, select the generative model, define frontend/backend/AI architecture, and set up the environment.</span></div><div class="task-meta">Epic 1</div></div>
+          <div class="step"><div class="step-no">2</div><div><strong>Core finance features</strong><span>Generate budget, analyze spending, create saving suggestions and build monthly reporting logic.</span></div><div class="task-meta">Epic 2</div></div>
+          <div class="step"><div class="step-no">3</div><div><strong>App logic</strong><span>Implement /, /analyse and /generate route flows, validation, prompt helpers and JSON response structure.</span></div><div class="task-meta">Epic 3</div></div>
+          <div class="step"><div class="step-no">4</div><div><strong>Frontend & deployment</strong><span>Responsive UI, dynamic JavaScript rendering, local testing and public deployment via Ngrok in the full-stack version.</span></div><div class="task-meta">Epics 4–5</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-grid" style="margin-top:15px">
+      <div class="tech-card"><h4>Hardware</h4><p>Intel Core i5 8th Gen+ / Ryzen 5 equivalent, 8 GB RAM minimum, 256 GB SSD or 500 GB HDD.</p></div>
+      <div class="tech-card"><h4>Operating system</h4><p>Windows 10/11, macOS Monterey+ or Linux Ubuntu 20.04+.</p></div>
+      <div class="tech-card"><h4>Development</h4><p>Chrome / Firefox / Edge, VS Code, Git, Python 3.8+ and AWS CLI.</p></div>
+      <div class="tech-card"><h4>Deployment</h4><p>Local Flask testing at 127.0.0.1:5000 and public tunneling through Ngrok in the full-stack setup.</p></div>
+      <div class="tech-card"><h4>Sheets</h4><p>Google Sheets is the specified tracking platform in the brief; this MVP exports clean CSV data ready to import.</p></div>
+    </div>
+
+    <div class="card" style="margin-top:15px">
+      <h3><i class="fa-solid fa-flag-checkered"></i> Project conclusion</h3>
+      <p style="margin:0;color:var(--muted);font-size:11px;line-height:1.8">
+        The Personal Finance Advisor Bot is designed as an AI-powered financial planning assistant that helps users log income and expenses,
+        generate budget plans, understand spending patterns, receive saving recommendations and monitor monthly performance. The architecture
+        described in the project brief is scalable toward Flask, SQLAlchemy/SQLite, Gemini AI and Google Sheets, while this standalone MVP
+        demonstrates the complete front-end experience and core finance logic without requiring a backend server to run.
+      </p>
+    </div>
+
+    <div class="key-note" style="margin-top:15px">
+      <strong>API security:</strong> never commit or publish a Gemini API key. In the full Flask architecture, keep the key in <code>.env</code>
+      and load it server-side. The optional browser key in this MVP exists only for live demonstration and is not embedded in the file.
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <span>Personal Finance Advisor Bot • Self-contained MVP</span>
+    <span>Flask • SQLAlchemy / SQLite • GeminiAI • JavaScript • Google Sheets-ready</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<div class="loading" id="loadingOverlay">
+  <div class="loading-card glass"><div class="spinner"></div><h3 id="loadingTitle">Analyzing your finances</h3><p id="loadingText">Generating budget, insights and saving suggestions…</p></div>
+</div>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "pfab_mvp_state_v1";
+const THEME_KEY = "pfab_theme_v1";
+let expenseChart = null;
+let incomeExpenseChart = null;
+let lastAnalysis = null;
+
+const $ = id => document.getElementById(id);
+const money = value => new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(Number(value)||0);
+const number = value => new Intl.NumberFormat("en-IN",{maximumFractionDigits:0}).format(Number(value)||0);
+const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const monthLabel = value => {
+  if(!value) return "Planning month";
+  const [y,m] = value.split("-");
+  return new Date(Number(y),Number(m)-1,1).toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+};
+
+const CATEGORY_META = {
+  rent:{label:"Rent / Housing",icon:"fa-house",tip:"Aim to keep housing near or below 30% of income."},
+  food:{label:"Food / Groceries",icon:"fa-utensils",tip:"Food is commonly easier to optimize by meal planning and grocery limits."},
+  transport:{label:"Transport",icon:"fa-bus",tip:"Review recurring travel costs and unnecessary trips."},
+  dining:{label:"Dining Out",icon:"fa-bowl-food",tip:"Dining is a flexible category where small cuts can create quick savings."},
+  entertainment:{label:"Entertainment",icon:"fa-gamepad",tip:"Keep discretionary entertainment within a controlled percentage."},
+  utilities:{label:"Utilities",icon:"fa-bolt",tip:"Track recurring bills and seasonal spikes."},
+  education:{label:"Education",icon:"fa-graduation-cap",tip:"Protect necessary learning expenses while avoiding impulse purchases."},
+  healthcare:{label:"Healthcare",icon:"fa-heart-pulse",tip:"Treat essential health costs as priority expenses."},
+  shopping:{label:"Shopping",icon:"fa-bag-shopping",tip:"Set a clear discretionary shopping cap."},
+  other:{label:"Other",icon:"fa-ellipsis",tip:"Review uncategorized spending each week."}
+};
+
+const CATEGORY_TIPS = {
+  rent:.30, food:.15, transport:.10, dining:.08, entertainment:.08, utilities:.10,
+  education:.10, healthcare:.10, shopping:.08, other:.05
+};
+const GOAL_DESCRIPTIONS = {
+  emergency_fund:"build a safety buffer for unexpected expenses",
+  vacation:"fund a planned vacation without debt",
+  gadget:"save for a gadget purchase while protecting core savings",
+  investment:"build a long-term investment contribution",
+  general_savings:"increase the monthly amount retained after expenses"
+};
+
+function defaultState(){
+  return {
+    profile:{month:new Date().toISOString().slice(0,7),income:0,goal:"emergency_fund"},
+    expenses:[],
+    savings:{target:0,current:0,targetMonths:6,monthly:0},
+    history:[]
+  };
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const merged=defaultState();
+    const parsed=JSON.parse(raw);
+    return {...merged,...parsed,profile:{...merged.profile,...(parsed.profile||{})},savings:{...merged.savings,...(parsed.savings||{})},expenses:Array.isArray(parsed.expenses)?parsed.expenses:[],history:Array.isArray(parsed.history)?parsed.history:[]};
+  }catch{ return defaultState(); }
+}
+let state=loadState();
+function saveState(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }
+
+function toast(message,type="info"){
+  const node=$("toast");
+  node.textContent=message;
+  node.className="toast show "+type;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>node.className="toast",2600);
+}
+function setLoading(on,title,text){
+  $("loadingOverlay").style.display=on?"flex":"none";
+  if(title) $("loadingTitle").textContent=title;
+  if(text) $("loadingText").textContent=text;
+}
+function fieldError(inputId,errorId,message){
+  const input=$(inputId), err=$(errorId);
+  if(!input || !err) return;
+  input.closest(".field")?.classList.add("has-error");
+  err.textContent=message;
+}
+function clearFieldError(inputId,errorId){
+  $(inputId)?.closest(".field")?.classList.remove("has-error");
+  if(errorId) $(errorId).textContent="";
+}
+
+function totalsByCategory(){
+  const totals={};
+  state.expenses.forEach(e=>{totals[e.category]=(totals[e.category]||0)+Number(e.amount||0)});
+  return totals;
+}
+function totalExpenses(){ return state.expenses.reduce((s,e)=>s+Number(e.amount||0),0); }
+function monthlySavings(){ return Math.max(0,Number(state.profile.income||0)-totalExpenses()); }
+
+function getBudgetRows(){
+  const income=Number(state.profile.income||0);
+  const actual=totalsByCategory();
+  return Object.keys(CATEGORY_META).map(key=>{
+    const pct = CATEGORY_TIPS[key] || .05;
+    const limit = income*pct;
+    const spent = actual[key]||0;
+    const ratio=limit ? spent/limit : 0;
+    let status="On track";
+    if(ratio>1.05) status="Overspending";
+    else if(ratio>.8) status="Watch";
+    return {key,label:CATEGORY_META[key].label,icon:CATEGORY_META[key].icon,pct,limit,spent,ratio,status};
+  }).filter(x=>x.limit>0 || x.spent>0);
+}
+
+function buildLocalAnalysis(){
+  const income=Number(state.profile.income||0);
+  const expenses=totalExpenses();
+  const savings=monthlySavings();
+  const rate=income>0 ? (savings/income)*100 : 0;
+  const goalDesc=GOAL_DESCRIPTIONS[state.profile.goal]||"improve monthly savings";
+  const rows=getBudgetRows();
+  const overs = rows.filter(r=>r.ratio>1);
+  const top = [...rows].sort((a,b)=>b.spent-a.spent).slice(0,3);
+
+  const suggestions=[];
+  if(income<=0){
+    suggestions.push("Enter a monthly income to generate personalized budget percentages.");
+  }else{
+    if(rate<20) suggestions.push(`Your current savings rate is ${rate.toFixed(1)}%. Target at least 20% where practical by trimming flexible expenses first.`);
+    else suggestions.push(`Your current savings rate is ${rate.toFixed(1)}%. Protect this saving habit before increasing discretionary spending.`);
+    overs.slice(0,3).forEach(r=>suggestions.push(`Reduce ${r.label} by about ${money(Math.max(0,r.spent-r.limit))} to bring it closer to the project threshold.`));
+    if(overs.length===0) suggestions.push("No category is currently above its threshold. Keep logging every daily and weekly expense so the picture stays accurate.");
+    suggestions.push(`Prioritize your goal: ${goalDesc}. Automate or transfer the planned saving amount early in the month when possible.`);
+  }
+  const analysisText = top.length
+    ? `Highest spending categories: ${top.map(r=>`${r.label} (${money(r.spent)})`).join(", ")}. ${overs.length?`Overspending is visible in ${overs.length} category${overs.length>1?"ies":""}.`:"No threshold breaches are detected from the current entries."}`
+    : "Add expenses to unlock category-level spending analysis.";
+
+  return {income,expenses,savings,rate,rows,overs,suggestions:suggestions.slice(0,5),analysisText};
+}
+
+function updateDashboard(analysis){
+  const a=analysis||buildLocalAnalysis();
+  $("dashIncome").textContent=money(a.income);
+  $("dashExpenses").textContent=money(a.expenses);
+  $("dashSavings").textContent=money(a.savings);
+  $("dashSavingsRate").textContent=`${a.rate.toFixed(1)}%`;
+  $("dashBudgetStatus").textContent=a.income<=0?"Ready":(a.overs.length?"Review":"On Track");
+}
+
+function renderExpenses(){
+  const container=$("expenseList");
+  const items=[...state.expenses].sort((a,b)=>String(b.date).localeCompare(String(a.date))||b.created-a.created);
+  $("expenseCount").textContent=`${items.length} ${items.length===1?"entry":"entries"}`;
+  if(!items.length){
+    container.innerHTML='<div class="empty"><i class="fa-solid fa-receipt"></i><p>No expenses yet. Add daily, weekly or monthly spending entries.</p></div>';
+    return;
+  }
+  container.innerHTML=items.map(item=>{
+    const meta=CATEGORY_META[item.category]||CATEGORY_META.other;
+    return `<div class="expense-item">
+      <div class="expense-icon"><i class="fa-solid ${meta.icon}"></i></div>
+      <div class="expense-main"><strong>${esc(meta.label)}</strong><span>${esc(item.date)} • ${esc(item.frequency)}${item.note?` • ${esc(item.note)}`:""}</span></div>
+      <div class="expense-amount"><div>${money(item.amount)}</div><button class="icon-btn" style="width:31px;height:31px;margin-top:5px" title="Delete expense" data-delete-expense="${esc(item.id)}"><i class="fa-solid fa-trash"></i></button></div>
+    </div>`;
+  }).join("");
+  container.querySelectorAll("[data-delete-expense]").forEach(btn=>btn.addEventListener("click",()=>{
+    state.expenses=state.expenses.filter(x=>x.id!==btn.dataset.deleteExpense);
+    saveState(); renderExpenses(); renderAll();
+    toast("Expense removed.","info");
+  }));
+}
+
+function renderBudget(analysis){
+  const a=analysis||buildLocalAnalysis();
+  const grid=$("budgetGrid");
+  if(a.income<=0 && !a.rows.length){
+    $("budgetEmpty").classList.remove("hidden");$("budgetArea").classList.add("hidden");return;
+  }
+  $("budgetEmpty").classList.add("hidden");$("budgetArea").classList.remove("hidden");
+  const reserve=Math.max(20, Math.min(35, 100-a.rows.reduce((s,r)=>s+r.pct*100,0)));
+  const rows=[...a.rows];
+  if(a.income>0){
+    grid.innerHTML=rows.map(r=>{
+      const bar=Math.min(160,r.ratio*100);
+      const statusClass=r.status==="Overspending"?"pill-bad":r.status==="Watch"?"pill-warn":"pill-good";
+      return `<div class="budget-card">
+        <div class="budget-row"><strong><i class="fa-solid ${r.icon}"></i> ${esc(r.label)}</strong><span>${money(r.limit)}</span></div>
+        <div class="budget-bar"><div class="budget-fill" style="width:${Math.min(100,bar)}%"></div></div>
+        <div class="budget-note">${money(r.spent)} spent • ${(r.pct*100).toFixed(0)}% target <span class="status-pill ${statusClass}" style="float:right">${esc(r.status)}</span></div>
+      </div>`;
+    }).join("") + `<div class="budget-card"><div class="budget-row"><strong><i class="fa-solid fa-piggy-bank"></i> Savings reserve</strong><span>${reserve.toFixed(0)}% target</span></div><div class="budget-bar"><div class="budget-fill" style="width:${Math.min(100,reserve)}%"></div></div><div class="budget-note">Suggested minimum savings target from the project brief: 20%.</div></div>`;
+  }else{
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="fa-solid fa-indian-rupee-sign"></i><p>Set a monthly income first.</p></div>';
+  }
+}
+
+function renderInsights(analysis){
+  const a=analysis||buildLocalAnalysis();
+  const container=$("insightsList");
+  const list=[];
+  if(a.income>0){
+    list.push({icon:"fa-chart-line",title:`Savings rate: ${a.rate.toFixed(1)}%`,text:a.rate>=20?"You are at or above the 20% savings target used in the project brief.":"Your current savings rate is below 20%; focus on flexible spending and recurring leaks."});
+    a.overs.slice(0,3).forEach(r=>list.push({icon:"fa-triangle-exclamation",title:`Watch ${r.label}`,text:`${money(r.spent)} spent vs ${money(r.limit)} guideline — consider reducing by ${money(Math.max(0,r.spent-r.limit))}.`}));
+    const top=[...a.rows].sort((x,y)=>y.spent-x.spent)[0];
+    if(top && top.spent) list.push({icon:"fa-ranking-star",title:"Top spending category",text:`${top.label} is currently your largest logged category at ${money(top.spent)}.`});
+  }
+  if(!list.length) container.innerHTML='<div class="empty"><i class="fa-solid fa-wand-magic-sparkles"></i><p>Analyze your finances to generate insights.</p></div>';
+  else container.innerHTML=list.slice(0,5).map(x=>`<div class="insight"><i class="fa-solid ${x.icon}"></i><div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div></div>`).join("");
+}
+
+function drawCharts(analysis){
+  if(!window.Chart) return;
+  const labels=analysis.rows.filter(r=>r.spent>0).map(r=>r.label);
+  const values=analysis.rows.filter(r=>r.spent>0).map(r=>r.spent);
+  const textColor=getComputedStyle(document.body).getPropertyValue("--muted").trim();
+  const gridColor=getComputedStyle(document.body).getPropertyValue("--line").trim();
+
+  if(expenseChart) expenseChart.destroy();
+  expenseChart=new Chart($("expenseChart"),{
+    type:"doughnut",
+    data:{labels:labels.length?labels:["No expenses"],datasets:[{data:values.length?values:[1],borderWidth:0,backgroundColor:["#7c5cff","#3b82f6","#22d3ee","#22c55e","#f59e0b","#ef4444","#ec4899","#8b5cf6","#14b8a6","#64748b"]}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:"65%",plugins:{legend:{position:"bottom",labels:{color:textColor,boxWidth:11,padding:12,font:{size:9}}}}}
+  });
+
+  if(incomeExpenseChart) incomeExpenseChart.destroy();
+  incomeExpenseChart=new Chart($("incomeExpenseChart"),{
+    type:"bar",
+    data:{labels:["Income","Expenses","Savings"],datasets:[{label:"Amount",data:[analysis.income,analysis.expenses,analysis.savings],borderRadius:10,backgroundColor:["#7c5cff","#ef4444","#22c55e"]}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:textColor},grid:{color:"transparent"}},y:{ticks:{color:textColor,callback:v=>`₹${number(v)}`},grid:{color:gridColor}}}}
+  });
+}
+
+function updateSavings(){
+  const s=state.savings;
+  const target=Number(s.target)||0;
+  const current=Math.min(Number(s.current)||0,target||Number(s.current)||0);
+  const pct=target?Math.min(100,(current/target)*100):0;
+  const remaining=Math.max(0,target-current);
+  const needed=s.targetMonths?Math.ceil(remaining/Number(s.targetMonths)):0;
+  $("savePercent").textContent=`${pct.toFixed(0)}%`;
+  $("saveGoal").textContent=money(target);
+  $("saveCurrent").textContent=money(current);
+  $("saveRemaining").textContent=money(remaining);
+  $("saveNeeded").textContent=money(needed);
+  $("saveFill").style.width=`${pct}%`;
+  $("saveRing").style.background=`conic-gradient(var(--green) 0deg, var(--cyan) ${Math.max(1,pct)*3.6}deg, rgba(255,255,255,.08) ${Math.max(1,pct)*3.6}deg 360deg)`;
+  $("saveMessage").textContent=target?`Goal: ${money(target)} • ${current>=target?"Goal reached — protect the habit and reset for the next goal.":`${money(remaining)} remaining over ${number(s.targetMonths)} month(s), about ${money(needed)} per month needed.`}`:"Set a target to start tracking your savings journey.";
+}
+
+function buildReport(analysis){
+  const month=monthLabel(state.profile.month);
+  const top=[...analysis.rows].sort((a,b)=>b.spent-a.spent).filter(x=>x.spent>0).slice(0,5);
+  const goal=GOAL_DESCRIPTIONS[state.profile.goal]||"improve monthly savings";
+  $("reportContent").innerHTML=`
+    <div class="report-header"><div><h3>${esc(month)} Financial Report</h3><p>Personal Finance Advisor Bot • generated ${esc(new Date().toLocaleString("en-IN"))}</p></div><span class="status-pill ${analysis.overs.length?'pill-warn':'pill-good'}"><i class="fa-solid fa-circle"></i> ${analysis.overs.length?'Needs attention':'On track'}</span></div>
+    <div class="report-summary">
+      <div class="report-stat"><span>Income</span><strong>${money(analysis.income)}</strong></div>
+      <div class="report-stat"><span>Expenses</span><strong>${money(analysis.expenses)}</strong></div>
+      <div class="report-stat"><span>Savings achieved</span><strong>${money(analysis.savings)}</strong></div>
+      <div class="report-stat"><span>Savings rate</span><strong>${analysis.rate.toFixed(1)}%</strong></div>
+    </div>
+    <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Category</th><th>Spent</th><th>Guideline</th><th>Status</th></tr></thead><tbody>
+      ${top.length?top.map(r=>`<tr><td>${esc(r.label)}</td><td>${money(r.spent)}</td><td>${money(r.limit)}</td><td>${esc(r.status)}</td></tr>`).join(""):'<tr><td colspan="4">No expense data available.</td></tr>'}
+    </tbody></table></div>
+    <div class="key-note"><strong>Goal for next month:</strong> ${esc(goal)}. ${analysis.suggestions[0]?esc(analysis.suggestions[0]):"Keep recording expenses and review the monthly report."}</div>
+  `;
+}
+
+function generateAnalysis(){
+  const a=buildLocalAnalysis();
+  lastAnalysis=a;
+  updateDashboard(a);renderBudget(a);renderInsights(a);drawCharts(a);buildReport(a);
+  saveState();
+}
+
+async function callGemini(question){
+  const key=sessionStorage.getItem("pfab_gemini_key");
+  if(!key) return null;
+  const a=buildLocalAnalysis();
+  const prompt=`You are a personal finance assistant for an MVP. Give practical, concise, non-investment-advisory financial planning guidance.
+Current month: ${monthLabel(state.profile.month)}
+Income: ${a.income}
+Total expenses: ${a.expenses}
+Savings: ${a.savings}
+Savings rate: ${a.rate.toFixed(1)}%
+Primary goal: ${state.profile.goal}
+Top categories: ${a.rows.filter(r=>r.spent>0).sort((x,y)=>y.spent-x.spent).slice(0,5).map(r=>`${r.label}=${r.spent}`).join(", ")}
+Question: ${question}
+Return clear bullets and rupee amounts where useful.`;
+  try{
+    const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+encodeURIComponent(key),{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({generationConfig:{temperature:.7,maxOutputTokens:2048},contents:[{parts:[{text:prompt}]}]})
+    });
+    if(!response.ok) throw new Error("Gemini API request failed");
+    const data=await response.json();
+    const text=data?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("").trim();
+    return text?{source:"Gemini AI • gemini-2.0-flash",text}:null;
+  }catch(error){
+    return null;
+  }
+}
+
+function localFinancialGuidance(question){
+  const q=question.toLowerCase();
+  const a=buildLocalAnalysis();
+  const top=[...a.rows].sort((x,y)=>y.spent-x.spent).find(x=>x.spent>0);
+  const goal=GOAL_DESCRIPTIONS[state.profile.goal]||"improve monthly savings";
+  const answers=[];
+  if(q.includes("food")||q.includes("dining")) answers.push("Set a weekly food + dining cap, plan meals before ordering, and move the saved amount into your chosen goal.");
+  else if(q.includes("emergency")) answers.push("Build a starter emergency reserve first, then expand it gradually. Keep the contribution automatic and separate from spending money.");
+  else if(q.includes("save")||q.includes("savings")) answers.push(`Your current monthly savings are ${money(a.savings)} (${a.rate.toFixed(1)}%). ${a.rate<20?"A practical next step is to target 20% over time by trimming flexible categories.":"Protect this level before adding new discretionary commitments."}`);
+  else if(q.includes("cut")||q.includes("reduce")) answers.push(top?`Start by reviewing ${top.label}, your largest logged category at ${money(top.spent)}. Compare it with the suggested guideline before cutting essentials.`:"Add a few expenses first; the largest category is the best starting point for a focused reduction.");
+  else answers.push(`Based on the current snapshot, you have ${money(a.income)} income, ${money(a.expenses)} expenses and ${money(a.savings)} remaining. Focus on ${goal}.`);
+  if(a.overs.length) answers.push(`Watch: ${a.overs.slice(0,3).map(x=>`${x.label} (${money(x.spent)} vs ${money(x.limit)})`).join(", ")}.`);
+  answers.push("This MVP provides planning guidance, not regulated financial advice. For investments, taxes or credit decisions, verify details with a qualified professional.");
+  return answers.join("\n\n");
+}
+
+async function askAdvisor(question){
+  $("aiSource").textContent="Analyzing…";
+  $("aiText").innerHTML='<span class="typing">Preparing guidance <i class="fa-solid fa-circle"></i><i class="fa-solid fa-circle"></i><i class="fa-solid fa-circle"></i></span>';
+  const ai=await callGemini(question);
+  const text=ai?.text||localFinancialGuidance(question);
+  $("aiText").textContent=text;
+  $("aiSource").textContent=ai?.source||"Local fallback • rule-based finance guidance";
+}
+
+function addHistory(){
+  const a=buildLocalAnalysis();
+  const record={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),timestamp:new Date().toISOString(),month:state.profile.month,income:a.income,expenses:a.expenses,savings:a.savings,rate:a.rate,goal:state.profile.goal,overs:a.overs.map(x=>x.label)};
+  state.history.unshift(record);
+  state.history=state.history.slice(0,20);
+  saveState();
+  renderHistory();
+}
+
+function renderHistory(){
+  const container=$("historyList");
+  if(!state.history.length){
+    container.innerHTML='<div class="empty"><i class="fa-solid fa-clock-rotate-left"></i><p>No analysis history yet. Run the finance analysis to create the first record.</p></div>';return;
+  }
+  container.innerHTML=`<div class="history-list">${state.history.map(item=>`
+    <div class="history-item">
+      <div class="history-icon"><i class="fa-solid fa-chart-line"></i></div>
+      <div class="history-main"><strong>${esc(monthLabel(item.month))}</strong><span>Income ${money(item.income)} • Expenses ${money(item.expenses)} • Savings ${money(item.savings)} • ${Number(item.rate||0).toFixed(1)}% saved</span><span>${new Date(item.timestamp).toLocaleString("en-IN")}</span></div>
+      <div class="history-actions"><button class="icon-btn" title="Restore" data-restore-history="${esc(item.id)}"><i class="fa-solid fa-rotate-left"></i></button><button class="icon-btn" title="Delete" data-delete-history="${esc(item.id)}"><i class="fa-solid fa-trash"></i></button></div>
+    </div>`).join("")}</div>`;
+  container.querySelectorAll("[data-delete-history]").forEach(btn=>btn.addEventListener("click",()=>{
+    state.history=state.history.filter(x=>x.id!==btn.dataset.deleteHistory);saveState();renderHistory();toast("History item deleted.","info");
+  }));
+  container.querySelectorAll("[data-restore-history]").forEach(btn=>btn.addEventListener("click",()=>{
+    const item=state.history.find(x=>x.id===btn.dataset.restoreHistory);if(!item)return;
+    state.profile.month=item.month;state.profile.income=item.income;state.profile.goal=item.goal;
+    $("month").value=item.month;$("income").value=item.income;$("goal").value=item.goal;
+    saveState();generateAnalysis();toast("Saved monthly profile restored.","success");
+    $("planner").scrollIntoView({behavior:"smooth"});
+  }));
+}
+
+function collectProfile(){
+  clearFieldError("month","monthError");clearFieldError("income","incomeError");
+  const month=$("month").value.trim(), income=Number($("income").value);
+  let ok=true;
+  if(!month){fieldError("month","monthError","Please choose a planning month.");ok=false}
+  if(!Number.isFinite(income)||income<=0){fieldError("income","incomeError","Enter a monthly income greater than zero.");ok=false}
+  if(!ok) return false;
+  state.profile={month,income,goal:$("goal").value};
+  return true;
+}
+
+function fillDemo(){
+  state.profile={month:new Date().toISOString().slice(0,7),income:50000,goal:"emergency_fund"};
+  state.expenses=[
+    {id:"d1",category:"rent",amount:14000,date:new Date().toISOString().slice(0,10),frequency:"monthly",note:"Home rent",created:1},
+    {id:"d2",category:"food",amount:6500,date:new Date().toISOString().slice(0,10),frequency:"weekly",note:"Groceries + meals",created:2},
+    {id:"d3",category:"transport",amount:4200,date:new Date().toISOString().slice(0,10),frequency:"monthly",note:"Metro + cab",created:3},
+    {id:"d4",category:"dining",amount:4800,date:new Date().toISOString().slice(0,10),frequency:"weekly",note:"Eating out",created:4},
+    {id:"d5",category:"entertainment",amount:1900,date:new Date().toISOString().slice(0,10),frequency:"monthly",note:"Movies + games",created:5},
+    {id:"d6",category:"utilities",amount:3100,date:new Date().toISOString().slice(0,10),frequency:"monthly",note:"Electricity + internet",created:6},
+    {id:"d7",category:"shopping",amount:2600,date:new Date().toISOString().slice(0,10),frequency:"one_time",note:"Clothes",created:7}
+  ];
+  state.savings={target:100000,current:25000,targetMonths:8,monthly:10000};
+  $("month").value=state.profile.month;$("income").value=state.profile.income;$("goal").value=state.profile.goal;
+  saveState();renderExpenses();updateSavings();generateAnalysis();addHistory();
+  $("planner").scrollIntoView({behavior:"smooth"});
+  toast("Demo data loaded — all modules are populated.","success");
+}
+
+function exportCSV(filename,rows){
+  const csv=rows.map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),400);
+}
+
+function exportCurrentData(){
+  const rows=[["Date","Frequency","Category","Amount","Note"],...state.expenses.map(e=>[e.date,e.frequency,CATEGORY_META[e.category]?.label||e.category,e.amount,e.note||""])];
+  if(rows.length===1){toast("No expenses to export yet.","info");return}
+  exportCSV("personal-finance-expenses.csv",rows);toast("Expense data exported as CSV.","success");
+}
+
+function exportReport(){
+  const a=lastAnalysis||buildLocalAnalysis();
+  const rows=[
+    ["Personal Finance Advisor Bot","Monthly Report"],
+    ["Month",monthLabel(state.profile.month)],
+    ["Income",a.income],["Expenses",a.expenses],["Savings",a.savings],["Savings Rate",a.rate.toFixed(1)+"%"],["Goal",GOAL_DESCRIPTIONS[state.profile.goal]],
+    [],
+    ["Category","Spent","Guideline","Status"],...a.rows.map(r=>[r.label,r.spent,r.limit,r.status])
+  ];
+  exportCSV("personal-finance-monthly-report.csv",rows);toast("Monthly report exported as CSV.","success");
+}
+
+function resetMonth(){
+  if(!confirm("Reset this month's profile and expenses?")) return;
+  state={...defaultState(),history:state.history};
+  saveState();loadIntoForms();renderExpenses();updateSavings();renderAll();toast("Current month reset.","info");
+}
+
+function loadIntoForms(){
+  $("month").value=state.profile.month;$("income").value=state.profile.income||"";$("goal").value=state.profile.goal;
+  $("savingTarget").value=state.savings.target||"";$("savedSoFar").value=state.savings.current||"";$("targetMonths").value=state.savings.targetMonths||"";$("monthlySaving").value=state.savings.monthly||"";
+  $("expenseDate").value=new Date().toISOString().slice(0,10);
+}
+
+function renderAll(){
+  const a=buildLocalAnalysis();lastAnalysis=a;
+  updateDashboard(a);renderBudget(a);renderInsights(a);drawCharts(a);buildReport(a);updateSavings();renderHistory();
+}
+
+$("navToggle").addEventListener("click",()=>$("navMenu").classList.toggle("open"));
+document.querySelectorAll(".nav-link").forEach(link=>link.addEventListener("click",()=>$("navMenu").classList.remove("open")));
+const theme=localStorage.getItem(THEME_KEY)||"dark";document.body.dataset.theme=theme;$("themeToggle").innerHTML=theme==="dark"?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
+$("themeToggle").addEventListener("click",()=>{const next=document.body.dataset.theme==="dark"?"light":"dark";document.body.dataset.theme=next;localStorage.setItem(THEME_KEY,next);$("themeToggle").innerHTML=next==="dark"?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';renderAll()});
+
+$("profileForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(!collectProfile()) {toast("Please complete the required profile fields.","error");return}
+  setLoading(true,"Analyzing your finances","Generating budget, spending analysis and saving recommendations…");
+  setTimeout(()=>{generateAnalysis();addHistory();setLoading(false);toast("Personalized finance analysis is ready.","success");$("insights").scrollIntoView({behavior:"smooth"});},650);
+});
+$("profileDemoBtn").addEventListener("click",fillDemo);
+$("demoBtn").addEventListener("click",fillDemo);
+
+$("expenseForm").addEventListener("submit",e=>{
+  e.preventDefault();clearFieldError("expenseAmount","expenseAmountError");
+  const amount=Number($("expenseAmount").value);if(!Number.isFinite(amount)||amount<=0){fieldError("expenseAmount","expenseAmountError","Enter an expense greater than zero.");toast("Enter a valid expense amount.","error");return}
+  state.expenses.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),category:$("expenseCategory").value,amount,date:$("expenseDate").value||new Date().toISOString().slice(0,10),frequency:$("expenseFrequency").value,note:$("expenseNote").value.trim(),created:Date.now()});
+  $("expenseAmount").value="";$("expenseNote").value="";saveState();renderExpenses();renderAll();toast("Expense added to your ledger.","success");
+});
+$("clearExpensesBtn").addEventListener("click",()=>{state.expenses=[];saveState();renderExpenses();renderAll();toast("All current expenses cleared.","info")});
+document.querySelectorAll("[data-expense]").forEach(btn=>btn.addEventListener("click",()=>{const [cat,amt]=btn.dataset.expense.split(":");$("expenseCategory").value=cat;$("expenseAmount").value=amt;$("expenseAmount").focus()}));
+
+$("savingsForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  state.savings={target:Number($("savingTarget").value)||0,current:Number($("savedSoFar").value)||0,targetMonths:Number($("targetMonths").value)||6,monthly:Number($("monthlySaving").value)||0};
+  if(state.savings.current>state.savings.target&&state.savings.target>0) state.savings.current=state.savings.target;
+  saveState();updateSavings();toast("Savings progress updated.","success");
+});
+$("savingDemoBtn").addEventListener("click",()=>{state.savings={target:100000,current:25000,targetMonths:8,monthly:10000};loadIntoForms();updateSavings();saveState();toast("Demo savings goal loaded.","success")});
+
+$("aiForm").addEventListener("submit",async e=>{
+  e.preventDefault();clearFieldError("aiQuestion","aiQuestionError");const q=$("aiQuestion").value.trim();
+  if(q.length<5){fieldError("aiQuestion","aiQuestionError","Please enter a meaningful financial question.");toast("Enter a financial question.","error");return}
+  await askAdvisor(q);toast("Financial guidance is ready.","success");
+});
+document.querySelectorAll("#ai .chip").forEach(chip=>chip.addEventListener("click",()=>{$("aiQuestion").value=chip.dataset.prompt;$("aiQuestion").focus()}));
+$("clearAiBtn").addEventListener("click",()=>{$("aiQuestion").value="";$("aiText").textContent="Ask a question below to get personalized guidance.";$("aiSource").textContent=sessionStorage.getItem("pfab_gemini_key")?"Gemini key loaded":"Local fallback ready"});
+$("testGeminiBtn").addEventListener("click",async()=>{
+  const key=$("geminiKey").value.trim();if(!key){toast("Paste a Gemini API key first.","error");return}
+  sessionStorage.setItem("pfab_gemini_key",key);setLoading(true,"Testing Gemini connection","Calling the configured gemini-2.0-flash endpoint…");
+  const r=await callGemini("Give me one sentence confirming that the financial advisor connection is working.");
+  setLoading(false);
+  if(r){$("aiSource").textContent=r.source;$("aiText").textContent=r.text;toast("Gemini connection successful.","success")}
+  else{toast("Gemini could not be reached. Local fallback remains available.","error")}
+});
+$("clearGeminiKeyBtn").addEventListener("click",()=>{sessionStorage.removeItem("pfab_gemini_key");$("geminiKey").value="";$("aiSource").textContent="Local fallback ready";toast("Runtime Gemini key cleared.","info")});
+
+$("exportDataBtn").addEventListener("click",exportCurrentData);
+$("exportReportBtn").addEventListener("click",exportReport);
+$("printReportBtn").addEventListener("click",()=>window.print());
+$("clearHistoryBtn").addEventListener("click",()=>{if(!state.history.length){toast("History is already empty.","info");return}if(confirm("Clear all analysis history?")){state.history=[];saveState();renderHistory();toast("History cleared.","info")}});
+$("resetMonthBtn").addEventListener("click",resetMonth);
+
+const sections=[...document.querySelectorAll("header[id],main section[id]")];
+const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(!visible)return;document.querySelectorAll(".nav-link").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+visible.target.id))},{rootMargin:"-22% 0px -65% 0px",threshold:[0,.2,.5]});
+sections.forEach(s=>observer.observe(s));
+
+loadIntoForms();renderExpenses();renderAll();
+if(sessionStorage.getItem("pfab_gemini_key")) $("aiSource").textContent="Gemini key loaded • local fallback available";
+</script>
+</body>
+</html>
